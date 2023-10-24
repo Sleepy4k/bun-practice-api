@@ -1,14 +1,25 @@
 import App from 'bunrest'
-import { UserController } from './controller/_index'
+import * as routes from './routes/_index'
 
 const server = App();
 
-server.get('/user', UserController.index);
-server.get('/user/:id', UserController.show);
+// register routes
+server.use('/api', routes.userRoute);
 
-// use
+// middleware
 server.use((req, res, next) => {
   console.log("Init server for " + req.originalUrl);
+});
+
+// error handler
+server.use((req, res, next, err) => {
+  res.status(500)
+    .setHeader('Content-Type', 'application/json')
+    .json({
+      "status": false,
+      "message": "Internal Server Error",
+      "data": err?.message || null
+    });
 });
 
 server.listen(3000, () => {
